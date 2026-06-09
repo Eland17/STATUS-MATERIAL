@@ -47,11 +47,6 @@
             color: #000;
         }
         
-        /* Penyesuaian khusus tipe date agar selaras dengan input teks */
-        input[type="date"] {
-            text-transform: uppercase;
-        }
-
         textarea {
             resize: vertical;
             min-height: 60px;
@@ -140,7 +135,6 @@
             .status-lengkap { background-color: transparent !important; color: #155724 !important; border: 1px solid #155724; }
             .status-kurang { background-color: transparent !important; color: #856404 !important; border: 1px solid #856404; font-style: italic; }
             .status-belum-terima { background-color: transparent !important; color: #721c24 !important; border: 1px solid #721c24; font-weight: bold; }
-            input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-appearance: none; } /* Sembunyikan ikon kalender saat diprint */
         }
     </style>
 
@@ -173,7 +167,7 @@
                     <div style="border-top: 1px solid #000; margin: 3px -8px;"></div>
                     <div><span class="label-meta">DELIVERY</span>: <input type="text" id="meta-delivery" value="" style="width:75%;"></div>
                     <div style="border-top: 1px solid #000; margin: 3px -8px;"></div>
-                    <div><span class="label-meta">UPDATE</span>: <input type="date" id="meta-update" value="" style="width:75%;"></div>
+                    <div><span class="label-meta">UPDATE</span>: <input type="text" id="meta-update" value="" style="width:75%;"></div>
                 </div>
             </td>
         </tr>
@@ -283,7 +277,7 @@
         </thead>
         <tbody>
             <tr>
-                <td><input type="date" name="hist_date[]" value="" class="text-center"></td>
+                <td><input type="text" name="hist_date[]" value="" class="text-center"></td>
                 <td><input type="text" name="hist_sj[]" value="" class="text-center"></td>
                 <td><input type="text" name="hist_desc[]" value="" oninput="updateAllCalculations()"></td>
                 <td><input type="number" step="0.01" name="hist_qty[]" value="" class="text-right" oninput="updateAllCalculations()"></td>
@@ -332,9 +326,9 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const namaKoleksi = "TW_Worksheet_Database";
+    const namaKoleksi = "TW_Worksheet_Database"; // Menjaga nama cluster database konsisten
 
-    // --- Logika Kalkulasi ---
+    // --- Logika Kalkulasi & Tiga Kondisi Status Baris ---
     function calculateRow(inputElement) {
         var row = inputElement.closest('tr');
         if (!row) return;
@@ -440,7 +434,7 @@
         var newRow = table.insertRow(table.rows.length - 1); 
         newRow.innerHTML = `
             <td><input type="text" name="size_color[]" value="${color}"></td>
-            <td><input type="text" name="size_name[]" value="${name}"></td>
+            <td><input type="text" name="size_name[]" value="${name}" placeholder=""></td>
             <td><input type="number" step="0.01" name="size_qty[]" class="text-right size-qty-input" value="${qty}" oninput="calculateGrandTotalSize()"></td>
             <td class="col-aksi" style="text-align: center;"><button type="button" class="btn-action" onclick="removeSizeRow(this)">X</button></td>
         `;
@@ -467,12 +461,11 @@
     }
     function removeRow(btn) { btn.closest('tr').remove(); updateAllCalculations(); }
 
-    // MERUBAH FUNGSI INPUT BARIS HISTORI DINAMIS MENJADI TIPE DATE
     function addNewHistoryRow(date="", sj="", desc="", qty="") {
         var tableBody = document.querySelector('#historyTable tbody');
         var newRow = document.createElement('tr');
         newRow.innerHTML = `
-            <td><input type="date" name="hist_date[]" value="${date}" class="text-center"></td>
+            <td><input type="text" name="hist_date[]" value="${date}" class="text-center"></td>
             <td><input type="text" name="hist_sj[]" value="${sj}" class="text-center"></td>
             <td><input type="text" name="hist_desc[]" value="${desc}" oninput="updateAllCalculations()"></td>
             <td><input type="number" step="0.01" name="hist_qty[]" value="${qty}" class="text-right" oninput="updateAllCalculations()"></td>
@@ -482,7 +475,7 @@
     }
     function removeHistoryRow(btn) { btn.closest('tr').remove(); updateAllCalculations(); }
 
-    // --- Firebase Save ---
+    // --- LOGIKA BARU: MIGRASI SAVE KE FIRESTORE ---
     function saveData() {
         var noRegist = document.getElementById('auth-regist').value.trim();
         var noOr = document.getElementById('auth-or').value.trim();
@@ -494,6 +487,7 @@
 
         var docKey = noRegist ? noRegist : noOr;
 
+        // Menyusun Payload Dokumen Object
         var docData = {
             key: docKey,
             savedAt: new Date().toLocaleString('id-ID'),
@@ -501,7 +495,7 @@
                 buyer: document.getElementById('meta-buyer').value,
                 item: document.getElementById('meta-item').value,
                 delivery: document.getElementById('meta-delivery').value,
-                update: document.getElementById('meta-update').value, // Menyimpan string tanggal standar
+                update: document.getElementById('meta-update').value,
                 style_no: document.getElementById('style-no').value
             },
             auth: {
@@ -516,6 +510,7 @@
             notes: document.getElementById('document-notes').value
         };
 
+        // Ambil data array dari tabel size
         document.querySelectorAll('input[name="size_name[]"]').forEach((el, i) => {
             docData.sizes.push({ 
                 color: document.querySelectorAll('input[name="size_color[]"]')[i].value,
@@ -524,6 +519,7 @@
             });
         });
 
+        // Ambil data array dari tabel material utama
         document.querySelectorAll('#mainMaterialTable tbody tr input[name="desc[]"]').forEach((el, i) => {
             docData.materials.push({
                 desc: el.value,
@@ -534,19 +530,21 @@
             });
         });
 
+        // Ambil data array dari tabel histori gudang
         document.querySelectorAll('input[name="hist_date[]"]').forEach((el, i) => {
             docData.histories.push({
-                date: el.value, // Menyimpan string tanggal standar hist_date[]
+                date: el.value,
                 sj: document.querySelectorAll('input[name="hist_sj[]"]')[i].value,
                 desc: document.querySelectorAll('input[name="hist_desc[]"]')[i].value,
                 qty: document.querySelectorAll('input[name="hist_qty[]"]')[i].value
             });
         });
 
+        // Eksekusi Set / Save ke Cloud Firestore Server
         db.collection(namaKoleksi).doc(docKey).set(docData)
         .then(() => {
             alert('✅ Dokumen [' + docKey + '] BERHASIL disimpan ke Cloud Firebase!');
-            localStorage.removeItem('TW_Load_Target_Key');
+            localStorage.removeItem('TW_Load_Target_Key'); // Clear trigger load
         })
         .catch((error) => {
             console.error("Error Firebase Save: ", error);
@@ -554,18 +552,20 @@
         });
     }
 
-    // --- Firebase Load ---
+    // --- LOGIKA BARU: MIGRASI LOAD DARI FIRESTORE ---
     window.onload = function() {
         var loadKey = localStorage.getItem('TW_Load_Target_Key');
         if (loadKey) {
+            // Tarik data tunggal secara real-time langsung dari server cloud Firestore
             db.collection(namaKoleksi).doc(loadKey).get().then((doc) => {
                 if (doc.exists) {
                     var data = doc.data();
                     
+                    // Isi elemen meta input dasar
                     document.getElementById('meta-buyer').value = data.meta.buyer || "";
                     document.getElementById('meta-item').value = data.meta.item || "";
                     document.getElementById('meta-delivery').value = data.meta.delivery || "";
-                    document.getElementById('meta-update').value = data.meta.update || ""; // Mengembalikan nilai tanggal ke input picker
+                    document.getElementById('meta-update').value = data.meta.update || "";
                     document.getElementById('style-no').value = data.meta.style_no || "";
                     document.getElementById('auth-dibuat').value = data.auth.dibuat || "";
                     document.getElementById('auth-diperiksa').value = data.auth.diperiksa || "";
@@ -573,10 +573,12 @@
                     document.getElementById('auth-regist').value = data.auth.regist || "";
                     document.getElementById('document-notes').value = data.notes || "";
 
+                    // Reset penampung tabel agar siap diisi baris data cloud
                     document.querySelector('#sizeQtyTable tbody').innerHTML = `<tr style="font-weight: bold; background-color: #fafafa;"><td colspan="2" style="text-align: center;">TOTAL</td><td><input type="text" id="grand-size-total" class="text-right" value="0.00" style="font-weight: bold;" readonly></td><td class="col-aksi"></td></tr>`;
                     document.querySelector('#mainMaterialTable tbody').innerHTML = "";
                     document.querySelector('#historyTable tbody').innerHTML = "";
 
+                    // Konstruksi pemetaan baris dinamis dari cloud payload
                     if(data.sizes) data.sizes.forEach(s => addNewSizeRow(s.color || "", s.name, s.qty));
                     calculateGrandTotalSize();
                     if(data.materials) data.materials.forEach(m => addNewRow(m.desc, m.unit, m.qty, m.cons, m.loss));
@@ -587,7 +589,7 @@
                     alert("Dokumen target tidak ditemukan di Cloud!");
                     updateAllCalculations();
                 }
-                localStorage.removeItem('TW_Load_Target_Key');
+                localStorage.removeItem('TW_Load_Target_Key'); // Hapus instruksi load agar tidak loop balik
             }).catch((err) => {
                 console.error("Error Firebase Load: ", err);
                 updateAllCalculations();
