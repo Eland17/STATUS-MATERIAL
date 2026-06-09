@@ -57,14 +57,12 @@
         input.text-right { text-align: right; }
         input:focus, select:focus, textarea:focus { background-color: #e8f0fe; }
         
-        /* Variasi Warna Status */
         .text-minus { color: #dc3545 !important; font-weight: bold; }
         .status-badge { font-weight: bold; text-align: center; display: block; padding: 2px 4px; border-radius: 3px; font-size: 10px; }
         .status-lengkap { background-color: #d4edda; color: #155724; }
         .status-kurang { background-color: #fff3cd; color: #856404; }
         .status-belum-terima { background-color: #f8d7da; color: #721c24; }
 
-        /* Analisa Panel Summary */
         .analysis-summary-box {
             border: 2px solid #000;
             background-color: #fff;
@@ -76,7 +74,6 @@
         .analysis-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
         .global-status-banner { font-size: 16px; font-weight: bold; text-align: center; padding: 8px; border: 1px dashed #000; margin-top: 8px; }
 
-        /* Header & Structural Styles */
         .header-table td { padding: 0; }
         .header-cell-inner { padding: 5px 8px; min-height: 20px; }
         .title-sub { text-align: center; font-size: 12px; letter-spacing: 1px; }
@@ -96,21 +93,18 @@
         .history-section-title { font-size: 12px; font-weight: bold; margin-top: 20px; margin-bottom: 6px; border-left: 3px solid #000; padding-left: 6px; }
         .history-table th { font-weight: normal; text-align: center; background-color: #fafafa; padding: 6px 2px; }
 
-        /* Notes Area */
         .notes-container {
             border: 1px solid #000;
             padding: 8px;
             margin-top: 4px;
         }
 
-        /* Control Panel */
         .btn-action { background-color: #fff; border: 1px solid #777; color: #000; font-size: 9px; padding: 1px 4px; cursor: pointer; border-radius: 2px; }
         .btn-action:hover { background-color: #000; color: #fff; }
         .control-panel { margin-top: 15px; border-top: 1px dashed #aaa; padding-top: 15px; text-align: right; }
         .btn-main { background-color: #000; color: #fff; padding: 8px 16px; border: 1px solid #000; font-weight: bold; cursor: pointer; margin-left: 5px; }
         .btn-main:hover { background-color: #444; }
 
-        /* Navigation DB Bar */
         .db-navigation-bar {
             width: 900px;
             margin: 0 auto 15px auto;
@@ -132,9 +126,6 @@
             .control-panel, .btn-action, .col-aksi, .db-navigation-bar { display: none !important; }
             .worksheet-container { box-shadow: none; border: 1px solid #000; padding: 10px; width: 100% !important; }
             textarea { border: none; background: transparent; }
-            .status-lengkap { background-color: transparent !important; color: #155724 !important; border: 1px solid #155724; }
-            .status-kurang { background-color: transparent !important; color: #856404 !important; border: 1px solid #856404; font-style: italic; }
-            .status-belum-terima { background-color: transparent !important; color: #721c24 !important; border: 1px solid #721c24; font-weight: bold; }
         }
     </style>
 
@@ -167,7 +158,7 @@
                     <div style="border-top: 1px solid #000; margin: 3px -8px;"></div>
                     <div><span class="label-meta">DELIVERY</span>: <input type="text" id="meta-delivery" value="" style="width:75%;"></div>
                     <div style="border-top: 1px solid #000; margin: 3px -8px;"></div>
-                    <div><span class="label-meta">UPDATE</span>: <input type="text" id="meta-update" value="" style="width:75%;"></div>
+                    <div><span class="label-meta">UPDATE</span>: <input type="date" id="meta-update" value="" style="width:75%;"></div>
                 </div>
             </td>
         </tr>
@@ -212,8 +203,8 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="text" name="size_color[]" value="" placeholder=""></td>
-                        <td><input type="text" name="size_name[]" value="" placeholder=""></td>
+                        <td><input type="text" name="size_color[]" value=""></td>
+                        <td><input type="text" name="size_name[]" value=""></td>
                         <td><input type="number" step="0.01" name="size_qty[]" class="text-right size-qty-input" value="" oninput="calculateGrandTotalSize()"></td>
                         <td class="col-aksi" style="text-align: center;"><button type="button" class="btn-action" onclick="removeSizeRow(this)">X</button></td>
                     </tr>
@@ -277,10 +268,10 @@
         </thead>
         <tbody>
             <tr>
-                <td><input type="text" name="hist_date[]" value="" class="text-center"></td>
-                <td><input type="text" name="hist_sj[]" value="" class="text-center"></td>
-                <td><input type="text" name="hist_desc[]" value="" oninput="updateAllCalculations()"></td>
-                <td><input type="number" step="0.01" name="hist_qty[]" value="" class="text-right" oninput="updateAllCalculations()"></td>
+                <td><input type="date" name="hist_date[]" class="text-center"></td>
+                <td><input type="text" name="hist_sj[]" class="text-center"></td>
+                <td><input type="text" name="hist_desc[]" oninput="updateAllCalculations()"></td>
+                <td><input type="number" step="0.01" name="hist_qty[]" class="text-right" oninput="updateAllCalculations()"></td>
                 <td class="col-aksi" style="text-align:center;"><button type="button" class="btn-action" onclick="removeHistoryRow(this)">Hapus</button></td>
             </tr>
         </tbody>
@@ -314,7 +305,6 @@
 </div>
 
 <script>
-    // --- INTEGRASI KONFIGURASI FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyACOluEhfPw4JBlBaHyXtf1k3TIJAHikKo",
         authDomain: "inventory-gudang-16dfe.firebaseapp.com",
@@ -326,9 +316,8 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const namaKoleksi = "TW_Worksheet_Database"; // Menjaga nama cluster database konsisten
+    const namaKoleksi = "TW_Worksheet_Database";
 
-    // --- Logika Kalkulasi & Tiga Kondisi Status Baris ---
     function calculateRow(inputElement) {
         var row = inputElement.closest('tr');
         if (!row) return;
@@ -434,7 +423,7 @@
         var newRow = table.insertRow(table.rows.length - 1); 
         newRow.innerHTML = `
             <td><input type="text" name="size_color[]" value="${color}"></td>
-            <td><input type="text" name="size_name[]" value="${name}" placeholder=""></td>
+            <td><input type="text" name="size_name[]" value="${name}"></td>
             <td><input type="number" step="0.01" name="size_qty[]" class="text-right size-qty-input" value="${qty}" oninput="calculateGrandTotalSize()"></td>
             <td class="col-aksi" style="text-align: center;"><button type="button" class="btn-action" onclick="removeSizeRow(this)">X</button></td>
         `;
@@ -465,7 +454,7 @@
         var tableBody = document.querySelector('#historyTable tbody');
         var newRow = document.createElement('tr');
         newRow.innerHTML = `
-            <td><input type="text" name="hist_date[]" value="${date}" class="text-center"></td>
+            <td><input type="date" name="hist_date[]" value="${date}" class="text-center"></td>
             <td><input type="text" name="hist_sj[]" value="${sj}" class="text-center"></td>
             <td><input type="text" name="hist_desc[]" value="${desc}" oninput="updateAllCalculations()"></td>
             <td><input type="number" step="0.01" name="hist_qty[]" value="${qty}" class="text-right" oninput="updateAllCalculations()"></td>
@@ -475,19 +464,11 @@
     }
     function removeHistoryRow(btn) { btn.closest('tr').remove(); updateAllCalculations(); }
 
-    // --- LOGIKA BARU: MIGRASI SAVE KE FIRESTORE ---
     function saveData() {
         var noRegist = document.getElementById('auth-regist').value.trim();
         var noOr = document.getElementById('auth-or').value.trim();
-        
-        if(!noRegist && !noOr) {
-            alert("⚠️ Gagal menyimpan! Mohon isi NO. REGIST atau NO. OR terlebih dahulu sebagai identitas dokumen.");
-            return;
-        }
-
+        if(!noRegist && !noOr) { alert("⚠️ Mohon isi NO. REGIST atau NO. OR!"); return; }
         var docKey = noRegist ? noRegist : noOr;
-
-        // Menyusun Payload Dokumen Object
         var docData = {
             key: docKey,
             savedAt: new Date().toLocaleString('id-ID'),
@@ -509,59 +490,24 @@
             histories: [],
             notes: document.getElementById('document-notes').value
         };
-
-        // Ambil data array dari tabel size
         document.querySelectorAll('input[name="size_name[]"]').forEach((el, i) => {
-            docData.sizes.push({ 
-                color: document.querySelectorAll('input[name="size_color[]"]')[i].value,
-                name: el.value, 
-                qty: document.querySelectorAll('input[name="size_qty[]"]')[i].value 
-            });
+            docData.sizes.push({ color: document.querySelectorAll('input[name="size_color[]"]')[i].value, name: el.value, qty: document.querySelectorAll('input[name="size_qty[]"]')[i].value });
         });
-
-        // Ambil data array dari tabel material utama
         document.querySelectorAll('#mainMaterialTable tbody tr input[name="desc[]"]').forEach((el, i) => {
-            docData.materials.push({
-                desc: el.value,
-                unit: document.querySelectorAll('#mainMaterialTable tbody tr input[name="unit[]"]')[i].value,
-                qty: document.querySelectorAll('#mainMaterialTable tbody tr input[name="qty[]"]')[i].value,
-                cons: document.querySelectorAll('#mainMaterialTable tbody tr input[name="cons[]"]')[i].value,
-                loss: document.querySelectorAll('#mainMaterialTable tbody tr input[name="loss[]"]')[i].value
-            });
+            docData.materials.push({ desc: el.value, unit: document.querySelectorAll('#mainMaterialTable tbody tr input[name="unit[]"]')[i].value, qty: document.querySelectorAll('#mainMaterialTable tbody tr input[name="qty[]"]')[i].value, cons: document.querySelectorAll('#mainMaterialTable tbody tr input[name="cons[]"]')[i].value, loss: document.querySelectorAll('#mainMaterialTable tbody tr input[name="loss[]"]')[i].value });
         });
-
-        // Ambil data array dari tabel histori gudang
         document.querySelectorAll('input[name="hist_date[]"]').forEach((el, i) => {
-            docData.histories.push({
-                date: el.value,
-                sj: document.querySelectorAll('input[name="hist_sj[]"]')[i].value,
-                desc: document.querySelectorAll('input[name="hist_desc[]"]')[i].value,
-                qty: document.querySelectorAll('input[name="hist_qty[]"]')[i].value
-            });
+            docData.histories.push({ date: el.value, sj: document.querySelectorAll('input[name="hist_sj[]"]')[i].value, desc: document.querySelectorAll('input[name="hist_desc[]"]')[i].value, qty: document.querySelectorAll('input[name="hist_qty[]"]')[i].value });
         });
-
-        // Eksekusi Set / Save ke Cloud Firestore Server
-        db.collection(namaKoleksi).doc(docKey).set(docData)
-        .then(() => {
-            alert('✅ Dokumen [' + docKey + '] BERHASIL disimpan ke Cloud Firebase!');
-            localStorage.removeItem('TW_Load_Target_Key'); // Clear trigger load
-        })
-        .catch((error) => {
-            console.error("Error Firebase Save: ", error);
-            alert('❌ Gagal menyimpan ke Cloud. Cek koneksi internet Anda.');
-        });
+        db.collection(namaKoleksi).doc(docKey).set(docData).then(() => alert('✅ Dokumen [' + docKey + '] BERHASIL disimpan!')).catch((error) => alert('❌ Gagal menyimpan. Cek koneksi internet.'));
     }
 
-    // --- LOGIKA BARU: MIGRASI LOAD DARI FIRESTORE ---
     window.onload = function() {
         var loadKey = localStorage.getItem('TW_Load_Target_Key');
         if (loadKey) {
-            // Tarik data tunggal secara real-time langsung dari server cloud Firestore
             db.collection(namaKoleksi).doc(loadKey).get().then((doc) => {
                 if (doc.exists) {
                     var data = doc.data();
-                    
-                    // Isi elemen meta input dasar
                     document.getElementById('meta-buyer').value = data.meta.buyer || "";
                     document.getElementById('meta-item').value = data.meta.item || "";
                     document.getElementById('meta-delivery').value = data.meta.delivery || "";
@@ -572,27 +518,16 @@
                     document.getElementById('auth-or').value = data.auth.or || "";
                     document.getElementById('auth-regist').value = data.auth.regist || "";
                     document.getElementById('document-notes').value = data.notes || "";
-
-                    // Reset penampung tabel agar siap diisi baris data cloud
                     document.querySelector('#sizeQtyTable tbody').innerHTML = `<tr style="font-weight: bold; background-color: #fafafa;"><td colspan="2" style="text-align: center;">TOTAL</td><td><input type="text" id="grand-size-total" class="text-right" value="0.00" style="font-weight: bold;" readonly></td><td class="col-aksi"></td></tr>`;
                     document.querySelector('#mainMaterialTable tbody').innerHTML = "";
                     document.querySelector('#historyTable tbody').innerHTML = "";
-
-                    // Konstruksi pemetaan baris dinamis dari cloud payload
                     if(data.sizes) data.sizes.forEach(s => addNewSizeRow(s.color || "", s.name, s.qty));
                     calculateGrandTotalSize();
                     if(data.materials) data.materials.forEach(m => addNewRow(m.desc, m.unit, m.qty, m.cons, m.loss));
                     if(data.histories) data.histories.forEach(h => addNewHistoryRow(h.date, h.sj, h.desc, h.qty));
-                    
-                    updateAllCalculations();
-                } else {
-                    alert("Dokumen target tidak ditemukan di Cloud!");
                     updateAllCalculations();
                 }
-                localStorage.removeItem('TW_Load_Target_Key'); // Hapus instruksi load agar tidak loop balik
-            }).catch((err) => {
-                console.error("Error Firebase Load: ", err);
-                updateAllCalculations();
+                localStorage.removeItem('TW_Load_Target_Key');
             });
         } else {
             updateAllCalculations();
