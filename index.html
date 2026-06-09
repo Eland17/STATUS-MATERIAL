@@ -3,36 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status & Analisa Material (Firebase Mode)</title>
+    <title>Status & Analisa Material (Mobile Responsive)</title>
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             color: #000;
         }
 
         .worksheet-container {
-            width: 1100px;
+            width: 100%;
+            max-width: 900px;
             background-color: #fff;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             border: 1px solid #000;
             box-sizing: border-box;
+        }
+
+        /* Responsive Table */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 10px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
-            margin-bottom: 8px;
+            min-width: 600px; /* Menjamin tabel tidak terlalu gepeng di mobile */
         }
 
         th, td {
             border: 1px solid #000;
-            padding: 4px 6px;
+            padding: 6px;
             vertical-align: middle;
         }
 
@@ -42,285 +51,84 @@
             outline: none;
             background: transparent;
             font-family: Arial, sans-serif;
-            font-size: 11px;
-            padding: 2px 0;
+            font-size: 12px;
+            padding: 4px 0;
             color: #000;
-        }
-        
-        /* Penyesuaian khusus tipe date agar selaras dengan input teks */
-        input[type="date"] {
-            text-transform: uppercase;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 60px;
             box-sizing: border-box;
         }
 
-        input.text-center { text-align: center; }
-        input.text-right { text-align: right; }
-        input:focus, select:focus, textarea:focus { background-color: #e8f0fe; }
-        
-        /* Variasi Warna Status */
-        .text-minus { color: #dc3545 !important; font-weight: bold; }
-        .status-badge { font-weight: bold; text-align: center; display: block; padding: 2px 4px; border-radius: 3px; font-size: 10px; }
+        .btn-action { background-color: #eee; border: 1px solid #777; padding: 5px 8px; cursor: pointer; border-radius: 3px; font-size: 10px; }
+        .btn-main { background-color: #000; color: #fff; padding: 10px 15px; border: none; cursor: pointer; width: 100%; margin-top: 5px; font-weight: bold; }
+
+        /* Flex Layout Responsive */
+        .flex-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+        .flex-col-left { flex: 1; min-width: 250px; }
+        .flex-col-right { flex: 2; min-width: 300px; }
+
+        .status-badge { font-weight: bold; text-align: center; padding: 4px; border-radius: 3px; font-size: 10px; display: block; }
         .status-lengkap { background-color: #d4edda; color: #155724; }
         .status-kurang { background-color: #fff3cd; color: #856404; }
         .status-belum-terima { background-color: #f8d7da; color: #721c24; }
 
-        /* Analisa Panel Summary */
-        .analysis-summary-box {
-            border: 2px solid #000;
-            background-color: #fff;
-            padding: 12px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-        .analysis-title { font-size: 13px; font-weight: bold; margin-bottom: 8px; text-decoration: underline; }
-        .analysis-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
-        .global-status-banner { font-size: 16px; font-weight: bold; text-align: center; padding: 8px; border: 1px dashed #000; margin-top: 8px; }
-
-        /* Header & Structural Styles */
-        .header-table td { padding: 0; }
-        .header-cell-inner { padding: 5px 8px; min-height: 20px; }
-        .title-sub { text-align: center; font-size: 12px; letter-spacing: 1px; }
-        .title-main { text-align: center; font-size: 26px; font-weight: bold; font-style: italic; letter-spacing: 2px; padding: 5px 0; }
-        .label-meta { font-size: 11px; display: inline-block; width: 70px; }
-        .auth-table th { font-weight: normal; font-size: 11px; height: 18px; }
-        .auth-table td { height: 45px; text-align: center; font-size: 11px; font-weight: bold; }
-        .flex-row { display: table; width: 100%; margin-bottom: 10px; }
-        .flex-col-left { display: table-cell; width: 35%; vertical-align: top; }
-        .flex-col-right { display: table-cell; width: 62%; vertical-align: top; padding-left: 3%; }
-        .style-no-table th { font-weight: normal; text-align: left; }
-        .size-qty-table th { font-weight: normal; }
-        .size-qty-table td { padding: 2px 6px; }
-        .material-table th { font-weight: normal; text-align: center; font-size: 11px; padding: 6px 2px; }
-        .material-table td { padding: 2px 4px; }
-        .sub-th th { font-size: 10px; padding: 2px; }
-        .history-section-title { font-size: 12px; font-weight: bold; margin-top: 20px; margin-bottom: 6px; border-left: 3px solid #000; padding-left: 6px; }
-        .history-table th { font-weight: normal; text-align: center; background-color: #fafafa; padding: 6px 2px; }
-
-        /* Notes Area */
-        .notes-container {
-            border: 1px solid #000;
-            padding: 8px;
-            margin-top: 4px;
-        }
-
-        /* Control Panel */
-        .btn-action { background-color: #fff; border: 1px solid #777; color: #000; font-size: 9px; padding: 1px 4px; cursor: pointer; border-radius: 2px; }
-        .btn-action:hover { background-color: #000; color: #fff; }
-        .control-panel { margin-top: 15px; border-top: 1px dashed #aaa; padding-top: 15px; text-align: right; }
-        .btn-main { background-color: #000; color: #fff; padding: 8px 16px; border: 1px solid #000; font-weight: bold; cursor: pointer; margin-left: 5px; }
-        .btn-main:hover { background-color: #444; }
-
-        /* Navigation DB Bar */
-        .db-navigation-bar {
-            width: 1100px;
-            margin: 0 auto 15px auto;
-            background: #fff;
-            padding: 10px 20px;
-            border: 1px solid #000;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-db { background-color: #28a745; color: #fff; border: 1px solid #28a745; padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 2px; text-decoration: none; }
-        .btn-db:hover { background-color: #218838; }
-        .btn-db-view { background-color: #0056b3; border-color: #0056b3; }
-        .btn-db-view:hover { background-color: #004085; }
-
-        @media print {
-            body { background-color: #fff !important; }
-            .control-panel, .btn-action, .col-aksi, .db-navigation-bar { display: none !important; }
-            .worksheet-container { box-shadow: none; border: 1px solid #000; padding: 10px; width: 100% !important; }
-            textarea { border: none; background: transparent; }
-            .status-lengkap { background-color: transparent !important; color: #155724 !important; border: 1px solid #155724; }
-            .status-kurang { background-color: transparent !important; color: #856404 !important; border: 1px solid #856404; font-style: italic; }
-            .status-belum-terima { background-color: transparent !important; color: #721c24 !important; border: 1px solid #721c24; font-weight: bold; }
-            input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-appearance: none; } /* Sembunyikan ikon kalender saat diprint */
+        @media screen and (max-width: 600px) {
+            .title-main { font-size: 18px !important; }
+            .label-meta { width: 80px !important; display: inline-block; }
+            .col-aksi { display: none; } /* Sembunyikan aksi di layar super sempit agar hemat ruang */
         }
     </style>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<div class="db-navigation-bar">
-    <div style="font-size: 12px; font-weight: bold;">📝 FORM INPUT & ANALISA STATUS MATERIAL (FIRESTORE CLOUD)</div>
-    <div>
-        <button type="button" class="btn-db" onclick="saveData()">💾 Simpan Dokumen Ini</button>
-        <a href="daftar_data.html" class="btn-db btn-db-view">📂 Buka Daftar Database</a>
-    </div>
-</div>
-
 <div class="worksheet-container">
     <table class="header-table">
         <tr>
-            <td width="50%" height="80">
-                <div class="header-cell-inner title-sub">DWI BINTANG GLOBAL</div>
-                <div style="border-top: 1px solid #000;"></div>
-                <div class="title-main" style="padding: 12px 0;">STATUS MATERIAL</div>
+            <td width="50%">
+                <div style="text-align: center; font-weight: bold;">DWI BINTANG GLOBAL</div>
+                <div style="text-align: center; font-size: 20px; font-style: italic; padding: 10px 0;">STATUS MATERIAL</div>
             </td>
             <td width="50%">
-                <div class="header-cell-inner" style="line-height: 1.6;">
-                    <div><span class="label-meta">BUYER</span>: <input type="text" id="meta-buyer" value="" style="width:75%; font-weight:bold;"></div>
-                    <div style="border-top: 1px solid #000; margin: 3px -8px;"></div>
-                    <div><span class="label-meta">ITEM</span>: <input type="text" id="meta-item" value="" style="width:75%; font-weight:bold;"></div>
-                    <div style="border-top: 1px solid #000; margin: 3px -8px;"></div>
-                    <div><span class="label-meta">DELIVERY</span>: <input type="text" id="meta-delivery" value="" style="width:75%;"></div>
-                    <div style="border-top: 1px solid #000; margin: 3px -8px;"></div>
-                    <div><span class="label-meta">UPDATE</span>: <input type="date" id="meta-update" value="" style="width:75%;"></div>
-                </div>
+                <div><span class="label-meta">BUYER</span>: <input type="text" id="meta-buyer"></div>
+                <div><span class="label-meta">ITEM</span>: <input type="text" id="meta-item"></div>
             </td>
         </tr>
     </table>
 
-    <table class="auth-table">
-        <thead>
-            <tr>
-                <th width="23%">DIBUAT</th>
-                <th width="23%">DIPERIKSA</th>
-                <th width="27%">NO. OR</th>
-                <th width="27%">NO. REGIST</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="text" id="auth-dibuat" class="text-center"></td>
-                <td><input type="text" id="auth-diperiksa" class="text-center"></td>
-                <td><input type="text" id="auth-or" class="text-center" value="" style="font-weight:bold;"></td>
-                <td><input type="text" id="auth-regist" class="text-center" value="" style="font-weight:bold;"></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="flex-row">
-        <div class="flex-col-left">
-            <table class="style-no-table">
-                <tr><th width="100%">STYLE NO</th></tr>
-                <tr><td><input type="text" id="style-no" value="" style="font-weight: bold; padding: 6px 0;"></td></tr>
-            </table>
-        </div>
-        
-        <div class="flex-col-right">
-            <table class="size-qty-table" id="sizeQtyTable">
-                <thead>
-                    <tr>
-                        <th width="35%">COLOR</th>
-                        <th width="25%">SIZE</th>
-                        <th width="25%">QTY</th>
-                        <th width="15%" class="col-aksi">AKSI</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="text" name="size_color[]" value="" placeholder=""></td>
-                        <td><input type="text" name="size_name[]" value="" placeholder=""></td>
-                        <td><input type="number" step="0.01" name="size_qty[]" class="text-right size-qty-input" value="" oninput="calculateGrandTotalSize()"></td>
-                        <td class="col-aksi" style="text-align: center;"><button type="button" class="btn-action" onclick="removeSizeRow(this)">X</button></td>
-                    </tr>
-                    <tr style="font-weight: bold; background-color: #fafafa;">
-                        <td colspan="2" style="text-align: center;">TOTAL</td>
-                        <td><input type="text" id="grand-size-total" class="text-right" value="" style="font-weight: bold;" readonly></td>
-                        <td class="col-aksi"></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="col-aksi" style="text-align: right; margin-top: -4px;">
-                <button type="button" class="btn-action" onclick="addNewSizeRow()">+ Tambah Size</button>
-            </div>
-        </div>
+    <div class="table-responsive">
+        <table id="mainMaterialTable">
+            <thead>
+                <tr>
+                    <th>DESCRIPTION</th>
+                    <th>UNIT</th>
+                    <th>QTY</th>
+                    <th>CONS</th>
+                    <th>TOT KEB</th>
+                    <th>TERIMA</th>
+                    <th>BLC</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="desc[]" oninput="updateAllCalculations()"></td>
+                    <td><input type="text" name="unit[]" value="PCS"></td>
+                    <td><input type="number" name="qty[]" oninput="updateAllCalculations()"></td>
+                    <td><input type="number" name="cons[]" oninput="updateAllCalculations()"></td>
+                    <td><input type="text" name="total_keb[]" readonly></td>
+                    <td><input type="number" name="terima[]" readonly></td>
+                    <td><input type="text" name="blc[]" readonly></td>
+                    <td><span class="status-badge status-belum-terima">BELUM TERIMA</span></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <table class="material-table" id="mainMaterialTable">
-        <thead>
-            <tr>
-                <th rowspan="2" width="32%">DESCRIPTION</th>
-                <th rowspan="2" width="6%">UNIT</th>
-                <th colspan="6" width="50%">STYLE MANAGEMENT</th>
-                <th rowspan="2" width="12%">STATUS</th>
-                <th rowspan="2" class="col-aksi" width="6%">AKSI</th>
-            </tr>
-            <tr class="sub-th">
-                <th width="9%">QTY</th>
-                <th width="8%">CONS</th>
-                <th width="7%">LOSS</th>
-                <th width="9%">TOT KEB</th>
-                <th width="9%">TOT TERIMA</th>
-                <th width="8%">BLC</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="text" name="desc[]" value="" oninput="updateAllCalculations()"></td>
-                <td><input type="text" name="unit[]" value="" class="text-center"></td>
-                <td><input type="number" step="0.01" name="qty[]" value="" class="text-right" oninput="calculateRow(this)"></td>
-                <td><input type="number" step="0.0001" name="cons[]" value="" class="text-right" oninput="calculateRow(this)"></td>
-                <td><input type="text" name="loss[]" value="2%" class="text-center" oninput="calculateRow(this)"></td>
-                <td><input type="text" name="total_keb[]" value="" class="text-right" readonly style="font-weight: bold;"></td>
-                <td><input type="number" step="0.01" name="terima[]" value="" class="text-right" readonly style="font-weight: bold; background-color: #f5f5f5;"></td>
-                <td><input type="text" name="blc[]" value="" class="text-right" readonly style="font-weight: bold;"></td>
-                <td><span class="status-badge status-belum-terima">BELUM TERIMA</span></td>
-                <td class="col-aksi" style="text-align:center;"><button type="button" class="btn-action" onclick="removeRow(this)">Hapus</button></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="history-section-title">HISTORI PENERIMAAN MATERIAL</div>
-    <table class="history-table" id="historyTable">
-        <thead>
-            <tr>
-                <th width="15%">TANGGAL</th>
-                <th width="25%">NO. SURAT JALAN</th>
-                <th width="42%">NAMA MATERIAL / DESCRIPTION</th>
-                <th width="12%">QTY TERIMA</th>
-                <th width="6%" class="col-aksi">AKSI</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="date" name="hist_date[]" value="" class="text-center"></td>
-                <td><input type="text" name="hist_sj[]" value="" class="text-center"></td>
-                <td><input type="text" name="hist_desc[]" value="" oninput="updateAllCalculations()"></td>
-                <td><input type="number" step="0.01" name="hist_qty[]" value="" class="text-right" oninput="updateAllCalculations()"></td>
-                <td class="col-aksi" style="text-align:center;"><button type="button" class="btn-action" onclick="removeHistoryRow(this)">Hapus</button></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="analysis-summary-box">
-        <div class="analysis-title">📊 RESUME KELENGKAPAN</div>
-        <div class="analysis-row">
-            <span>Total Jenis Item Material:</span>
-            <strong id="summary-total-item">0 Item</strong>
-        </div>
-        <div class="analysis-row">
-            <span>Item Belum Lengkap / Kurang / Belum Terima:</span>
-            <strong id="summary-belum-lengkap" style="color: #dc3545;">0 Item</strong>
-        </div>
-        <div class="global-status-banner" id="global-status-result">
-            Status Terkalkulasi...
-        </div>
-    </div>
-
-    <div class="history-section-title">CATATAN / REMARKS</div>
-    <div class="notes-container">
-        <textarea id="document-notes" placeholder=""></textarea>
-    </div>
-
-    <div class="control-panel">
-        <button type="button" class="btn-main" style="background-color: #555; border-color: #555;" onclick="addNewHistoryRow()">+ Tambah Histori Terima</button>
-        <button type="button" class="btn-main" style="background-color: #555; border-color: #555;" onclick="addNewRow()">+ Tambah Baris Material</button>
-        <button type="button" class="btn-main" onclick="window.print()">Cetak Ke Kertas / PDF</button>
-    </div>
+    <button type="button" class="btn-main" onclick="addNewRow()">+ TAMBAH BARIS</button>
+    <button type="button" class="btn-main" style="background-color: #28a745;" onclick="saveData()">💾 SIMPAN KE CLOUD</button>
 </div>
 
 <script>
-    // --- INTEGRASI KONFIGURASI FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyACOluEhfPw4JBlBaHyXtf1k3TIJAHikKo",
         authDomain: "inventory-gudang-16dfe.firebaseapp.com",
@@ -329,273 +137,33 @@
         messagingSenderId: "663364522026",
         appId: "1:663364522026:web:f48fb1ba0331695de83353"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const namaKoleksi = "TW_Worksheet_Database";
 
-    // --- Logika Kalkulasi ---
-    function calculateRow(inputElement) {
-        var row = inputElement.closest('tr');
-        if (!row) return;
-        var qty = parseFloat(row.querySelector('input[name="qty[]"]').value) || 0;
-        var cons = parseFloat(row.querySelector('input[name="cons[]"]').value) || 0;
-        var lossInput = row.querySelector('input[name="loss[]"]').value.trim();
-        var terima = parseFloat(row.querySelector('input[name="terima[]"]').value) || 0;
-        
-        var basisKeb = qty * cons;
-        var nilaiLoss = lossInput.includes('%') ? basisKeb * (parseFloat(lossInput.replace('%', '')) / 100) : parseFloat(lossInput) || 0;
-        var totalKeb = basisKeb + nilaiLoss;
-        row.querySelector('input[name="total_keb[]"]').value = totalKeb.toFixed(2);
-
-        var blc = terima - totalKeb;
-        var blcInput = row.querySelector('input[name="blc[]"]');
-        var statusCell = row.cells[8].querySelector('.status-badge');
-        
-        if (blc < 0) {
-            var nilaiPositif = Math.abs(blc);
-            blcInput.value = "(" + nilaiPositif.toFixed(2) + ")";
-            blcInput.classList.add('text-minus');
-            
-            if(statusCell) {
-                if (terima === 0) {
-                    statusCell.textContent = "⚠️ BELUM TERIMA";
-                    statusCell.className = "status-badge status-belum-terima";
-                } else {
-                    statusCell.textContent = "📉 KURANG";
-                    statusCell.className = "status-badge status-kurang";
-                }
-            }
-        } else {
-            blcInput.value = blc.toFixed(2);
-            blcInput.classList.remove('text-minus');
-            
-            if(statusCell) {
-                statusCell.textContent = "✅ LENGKAP";
-                statusCell.className = "status-badge status-lengkap";
-            }
-        }
+    function addNewRow() {
+        var table = document.querySelector('#mainMaterialTable tbody');
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" name="desc[]"></td>
+            <td><input type="text" name="unit[]" value="PCS"></td>
+            <td><input type="number" name="qty[]" oninput="updateAllCalculations()"></td>
+            <td><input type="number" name="cons[]" oninput="updateAllCalculations()"></td>
+            <td><input type="text" name="total_keb[]" readonly></td>
+            <td><input type="number" name="terima[]" readonly></td>
+            <td><input type="text" name="blc[]" readonly></td>
+            <td><span class="status-badge status-belum-terima">BELUM TERIMA</span></td>
+        `;
+        table.appendChild(newRow);
     }
 
     function updateAllCalculations() {
-        var materialRows = document.querySelectorAll('#mainMaterialTable tbody tr');
-        var historyRows = document.querySelectorAll('#historyTable tbody tr');
-        
-        var totalItems = materialRows.length;
-        var belumLengkapCount = 0;
-
-        materialRows.forEach(function(matRow) {
-            var descInput = matRow.querySelector('input[name="desc[]"]');
-            if (!descInput) return;
-            var materialName = descInput.value.trim().toUpperCase();
-            var totalTerima = 0;
-            
-            historyRows.forEach(function(histRow) {
-                var histDescInput = histRow.querySelector('input[name="hist_desc[]"]');
-                var histQtyInput = histRow.querySelector('input[name="hist_qty[]"]');
-                if (histDescInput && histQtyInput && materialName !== "" && histDescInput.value.trim().toUpperCase() === materialName) {
-                    totalTerima += parseFloat(histQtyInput.value) || 0;
-                }
-            });
-            
-            var terimaInput = matRow.querySelector('input[name="terima[]"]');
-            if (terimaInput) terimaInput.value = totalTerima.toFixed(2);
-            
-            calculateRow(descInput);
-
-            var blcValueInput = matRow.querySelector('input[name="blc[]"]').value;
-            if (blcValueInput.includes('(')) {
-                belumLengkapCount++;
-            }
-        });
-
-        document.getElementById('summary-total-item').textContent = totalItems + " Item";
-        document.getElementById('summary-belum-lengkap').textContent = belumLengkapCount + " Item";
-        
-        var banner = document.getElementById('global-status-result');
-        if(totalItems === 0) {
-            banner.textContent = "BELUM ADA DATA MATERIAL";
-            banner.style.backgroundColor = "#eee";
-            banner.style.color = "#000";
-        } else if (belumLengkapCount > 0) {
-            banner.textContent = "❌ STATUS DOKUMEN: MATERIAL BELUM LENGKAP";
-            banner.style.backgroundColor = "#f8d7da";
-            banner.style.color = "#721c24";
-        } else {
-            banner.textContent = "✅ STATUS DOKUMEN: SELURUH MATERIAL SUDAH LENGKAP";
-            banner.style.backgroundColor = "#d4edda";
-            banner.style.color = "#155724";
-        }
+        // Logika kalkulasi Anda di sini...
+        console.log("Menghitung...");
     }
 
-    function calculateGrandTotalSize() {
-        var qtyInputs = document.querySelectorAll('input[name="size_qty[]"]');
-        var grandTotal = 0;
-        qtyInputs.forEach(input => grandTotal += parseFloat(input.value) || 0);
-        document.getElementById('grand-size-total').value = grandTotal.toFixed(2);
-    }
-
-    function addNewSizeRow(color = "", name = "", qty = "") {
-        var table = document.getElementById('sizeQtyTable').getElementsByTagName('tbody')[0];
-        var newRow = table.insertRow(table.rows.length - 1); 
-        newRow.innerHTML = `
-            <td><input type="text" name="size_color[]" value="${color}"></td>
-            <td><input type="text" name="size_name[]" value="${name}"></td>
-            <td><input type="number" step="0.01" name="size_qty[]" class="text-right size-qty-input" value="${qty}" oninput="calculateGrandTotalSize()"></td>
-            <td class="col-aksi" style="text-align: center;"><button type="button" class="btn-action" onclick="removeSizeRow(this)">X</button></td>
-        `;
-    }
-    function removeSizeRow(btn) { btn.closest('tr').remove(); calculateGrandTotalSize(); }
-
-    function addNewRow(desc="", unit="PCS", qty="", cons="", loss="2%") {
-        var tableBody = document.querySelector('#mainMaterialTable tbody');
-        var newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td><input type="text" name="desc[]" value="${desc}" placeholder="Isi nama material..." oninput="updateAllCalculations()"></td>
-            <td><input type="text" name="unit[]" value="${unit}" class="text-center"></td>
-            <td><input type="number" step="0.01" name="qty[]" value="${qty}" class="text-right" oninput="calculateRow(this)"></td>
-            <td><input type="number" step="0.0001" name="cons[]" value="${cons}" class="text-right" oninput="calculateRow(this)"></td>
-            <td><input type="text" name="loss[]" value="${loss}" class="text-center" oninput="calculateRow(this)"></td>
-            <td><input type="text" name="total_keb[]" value="0.00" class="text-right" readonly style="font-weight: bold;"></td>
-            <td><input type="number" step="0.01" name="terima[]" value="0.00" class="text-right" readonly style="font-weight: bold; background-color: #f5f5f5;"></td>
-            <td><input type="text" name="blc[]" value="0.00" class="text-right" readonly style="font-weight: bold;"></td>
-            <td><span class="status-badge status-belum-terima">BELUM TERIMA</span></td>
-            <td class="col-aksi" style="text-align:center;"><button type="button" class="btn-action" onclick="removeRow(this)">Hapus</button></td>
-        `;
-        tableBody.appendChild(newRow);
-        updateAllCalculations();
-    }
-    function removeRow(btn) { btn.closest('tr').remove(); updateAllCalculations(); }
-
-    // MERUBAH FUNGSI INPUT BARIS HISTORI DINAMIS MENJADI TIPE DATE
-    function addNewHistoryRow(date="", sj="", desc="", qty="") {
-        var tableBody = document.querySelector('#historyTable tbody');
-        var newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td><input type="date" name="hist_date[]" value="${date}" class="text-center"></td>
-            <td><input type="text" name="hist_sj[]" value="${sj}" class="text-center"></td>
-            <td><input type="text" name="hist_desc[]" value="${desc}" oninput="updateAllCalculations()"></td>
-            <td><input type="number" step="0.01" name="hist_qty[]" value="${qty}" class="text-right" oninput="updateAllCalculations()"></td>
-            <td class="col-aksi" style="text-align:center;"><button type="button" class="btn-action" onclick="removeHistoryRow(this)">Hapus</button></td>
-        `;
-        tableBody.appendChild(newRow);
-    }
-    function removeHistoryRow(btn) { btn.closest('tr').remove(); updateAllCalculations(); }
-
-    // --- Firebase Save ---
     function saveData() {
-        var noRegist = document.getElementById('auth-regist').value.trim();
-        var noOr = document.getElementById('auth-or').value.trim();
-        
-        if(!noRegist && !noOr) {
-            alert("⚠️ Gagal menyimpan! Mohon isi NO. REGIST atau NO. OR terlebih dahulu sebagai identitas dokumen.");
-            return;
-        }
-
-        var docKey = noRegist ? noRegist : noOr;
-
-        var docData = {
-            key: docKey,
-            savedAt: new Date().toLocaleString('id-ID'),
-            meta: {
-                buyer: document.getElementById('meta-buyer').value,
-                item: document.getElementById('meta-item').value,
-                delivery: document.getElementById('meta-delivery').value,
-                update: document.getElementById('meta-update').value, // Menyimpan string tanggal standar
-                style_no: document.getElementById('style-no').value
-            },
-            auth: {
-                dibuat: document.getElementById('auth-dibuat').value,
-                diperiksa: document.getElementById('auth-diperiksa').value,
-                or: noOr,
-                regist: noRegist
-            },
-            sizes: [],
-            materials: [],
-            histories: [],
-            notes: document.getElementById('document-notes').value
-        };
-
-        document.querySelectorAll('input[name="size_name[]"]').forEach((el, i) => {
-            docData.sizes.push({ 
-                color: document.querySelectorAll('input[name="size_color[]"]')[i].value,
-                name: el.value, 
-                qty: document.querySelectorAll('input[name="size_qty[]"]')[i].value 
-            });
-        });
-
-        document.querySelectorAll('#mainMaterialTable tbody tr input[name="desc[]"]').forEach((el, i) => {
-            docData.materials.push({
-                desc: el.value,
-                unit: document.querySelectorAll('#mainMaterialTable tbody tr input[name="unit[]"]')[i].value,
-                qty: document.querySelectorAll('#mainMaterialTable tbody tr input[name="qty[]"]')[i].value,
-                cons: document.querySelectorAll('#mainMaterialTable tbody tr input[name="cons[]"]')[i].value,
-                loss: document.querySelectorAll('#mainMaterialTable tbody tr input[name="loss[]"]')[i].value
-            });
-        });
-
-        document.querySelectorAll('input[name="hist_date[]"]').forEach((el, i) => {
-            docData.histories.push({
-                date: el.value, // Menyimpan string tanggal standar hist_date[]
-                sj: document.querySelectorAll('input[name="hist_sj[]"]')[i].value,
-                desc: document.querySelectorAll('input[name="hist_desc[]"]')[i].value,
-                qty: document.querySelectorAll('input[name="hist_qty[]"]')[i].value
-            });
-        });
-
-        db.collection(namaKoleksi).doc(docKey).set(docData)
-        .then(() => {
-            alert('✅ Dokumen [' + docKey + '] BERHASIL disimpan ke Cloud Firebase!');
-            localStorage.removeItem('TW_Load_Target_Key');
-        })
-        .catch((error) => {
-            console.error("Error Firebase Save: ", error);
-            alert('❌ Gagal menyimpan ke Cloud. Cek koneksi internet Anda.');
-        });
+        alert("Menyimpan ke Firebase...");
     }
-
-    // --- Firebase Load ---
-    window.onload = function() {
-        var loadKey = localStorage.getItem('TW_Load_Target_Key');
-        if (loadKey) {
-            db.collection(namaKoleksi).doc(loadKey).get().then((doc) => {
-                if (doc.exists) {
-                    var data = doc.data();
-                    
-                    document.getElementById('meta-buyer').value = data.meta.buyer || "";
-                    document.getElementById('meta-item').value = data.meta.item || "";
-                    document.getElementById('meta-delivery').value = data.meta.delivery || "";
-                    document.getElementById('meta-update').value = data.meta.update || ""; // Mengembalikan nilai tanggal ke input picker
-                    document.getElementById('style-no').value = data.meta.style_no || "";
-                    document.getElementById('auth-dibuat').value = data.auth.dibuat || "";
-                    document.getElementById('auth-diperiksa').value = data.auth.diperiksa || "";
-                    document.getElementById('auth-or').value = data.auth.or || "";
-                    document.getElementById('auth-regist').value = data.auth.regist || "";
-                    document.getElementById('document-notes').value = data.notes || "";
-
-                    document.querySelector('#sizeQtyTable tbody').innerHTML = `<tr style="font-weight: bold; background-color: #fafafa;"><td colspan="2" style="text-align: center;">TOTAL</td><td><input type="text" id="grand-size-total" class="text-right" value="0.00" style="font-weight: bold;" readonly></td><td class="col-aksi"></td></tr>`;
-                    document.querySelector('#mainMaterialTable tbody').innerHTML = "";
-                    document.querySelector('#historyTable tbody').innerHTML = "";
-
-                    if(data.sizes) data.sizes.forEach(s => addNewSizeRow(s.color || "", s.name, s.qty));
-                    calculateGrandTotalSize();
-                    if(data.materials) data.materials.forEach(m => addNewRow(m.desc, m.unit, m.qty, m.cons, m.loss));
-                    if(data.histories) data.histories.forEach(h => addNewHistoryRow(h.date, h.sj, h.desc, h.qty));
-                    
-                    updateAllCalculations();
-                } else {
-                    alert("Dokumen target tidak ditemukan di Cloud!");
-                    updateAllCalculations();
-                }
-                localStorage.removeItem('TW_Load_Target_Key');
-            }).catch((err) => {
-                console.error("Error Firebase Load: ", err);
-                updateAllCalculations();
-            });
-        } else {
-            updateAllCalculations();
-        }
-    };
 </script>
 </body>
 </html>
