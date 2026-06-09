@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status & Analisa Material (Firebase Mode)</title>
+    <title>Status Material</title>
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -146,8 +146,8 @@
 <div class="db-navigation-bar">
     <div style="font-size: 12px; font-weight: bold;">📝 FORM INPUT & ANALISA STATUS MATERIAL (FIRESTORE CLOUD)</div>
     <div>
-        <button type="button" class="btn-db" onclick="saveData()">💾 Simpan Dokumen Ini</button>
-        <a href="daftar_data.html" class="btn-db btn-db-view">📂 Buka Daftar Database</a>
+        <button type="button" class="btn-db" onclick="saveData()">💾 Simpan Dokumen</button>
+        <a href="daftar_data.html" class="btn-db btn-db-view">📂 Buka Database</a>
     </div>
 </div>
 
@@ -412,11 +412,11 @@
             banner.style.backgroundColor = "#eee";
             banner.style.color = "#000";
         } else if (belumLengkapCount > 0) {
-            banner.textContent = "❌ STATUS DOKUMEN: MATERIAL BELUM LENGKAP";
+            banner.textContent = "❌ STATUS : MATERIAL BELUM LENGKAP";
             banner.style.backgroundColor = "#f8d7da";
             banner.style.color = "#721c24";
         } else {
-            banner.textContent = "✅ STATUS DOKUMEN: SELURUH MATERIAL SUDAH LENGKAP";
+            banner.textContent = "✅ STATUS : SELURUH MATERIAL SUDAH LENGKAP";
             banner.style.backgroundColor = "#d4edda";
             banner.style.color = "#155724";
         }
